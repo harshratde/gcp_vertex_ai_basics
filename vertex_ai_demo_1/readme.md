@@ -19,3 +19,11 @@
 - Save working pynb file (Notebook)
 - Convert notebook to script
 - modify script to directly communicate with the GCP file storage, with no reference to local path
+
+## DIRECTORY STRUCTURE
+- ROOT
+    - DOCKERFILE
+    - config_run.yml
+    - config_env.yml
+    - src/
+        - <script.py>
