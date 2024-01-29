@@ -3,8 +3,6 @@
 
 # # Initiate vertex ai model builder
 
-# In[1]:
-
 
 import os
 import argparse
@@ -19,38 +17,53 @@ import os
 print(os.listdir())
 
 from pathlib import Path
-
-
-# In[2]:
-
-
 os.getcwd()
 
 
-# In[4]:
+ENV_EXEC = 'LOCAL'
+
+# ---- LOAD FROM config_env.yml ----------------
+BUCKET_NAME = "generic-harsh-buck"
 
 
-DATA_IN_PATH = '../DATA/INPUT'
-DATA_PROCESSED_PATH = '../DATA/PROCESSED'
-DATA_OUT_PATH = '../DATA/OUTPUT'
-MODEL_PATH  = '../MODEL'
+# ---- LOAD FROM config_run.yml ----------------
+ENV_NAME = 'DEV'
+PROJECT_NAME = 'DEMO'
+PREFIX = 'HR'
+ITERATION = 20240128
+PREFIC_ITERATION = f'{PREFIX}__{str(ITERATION)}'
 
+GCP_FILE_PATH = f'{ENV_NAME}/{PROJECT_NAME}/{PREFIC_ITERATION}'
 
-# In[5]:
+print('======================================================================')
+print(f'GCP BUCKET PATH : {GCP_FILE_PATH}')
+print('======================================================================')
 
+if ENV_EXEC == 'ML-SERVER' :
+    DATA_IN_PATH        = f'/gcs/{BUCKET_NAME}/{GCP_FILE_PATH}/INPUT'
+    DATA_PROCESSED_PATH = f'/gcs/{BUCKET_NAME}/{GCP_FILE_PATH}/PROCESSED'
+    DATA_OUT_PATH       = f'/gcs/{BUCKET_NAME}/{GCP_FILE_PATH}/OUTPUT'
+    MODEL_PATH          = f'/gcs/{BUCKET_NAME}/{GCP_FILE_PATH}/MODEL'
+else:
+    DATA_IN_PATH = '../DATA/INPUT'
+    DATA_PROCESSED_PATH = '../DATA/PROCESSED'
+    DATA_OUT_PATH = '../DATA/OUTPUT'
+    MODEL_PATH  = '../MODEL'
+    
+    Path(DATA_IN_PATH).mkdir( parents=True, exist_ok = True)
+    Path(DATA_PROCESSED_PATH).mkdir( parents=True, exist_ok = True)
+    Path(DATA_OUT_PATH).mkdir( parents=True, exist_ok = True)
+    Path(MODEL_PATH).mkdir( parents=True, exist_ok = True)
 
-Path(DATA_IN_PATH).mkdir( parents=True, exist_ok = True)
-Path(DATA_PROCESSED_PATH).mkdir( parents=True, exist_ok = True)
-Path(DATA_OUT_PATH).mkdir( parents=True, exist_ok = True)
-Path(MODEL_PATH).mkdir( parents=True, exist_ok = True)
 
 
 # ## 1. Load the data
 
-# In[6]:
 credit_df = pd.read_csv("https://azuremlexamples.blob.core.windows.net/datasets/credit_card/default_of_credit_card_clients.csv",
                         header=1,
                         index_col=0)
+# ALTERNATE PATH
+# f'/gcs/{BUCKET_NAME}/{GCP_FILE_PATH}'
 
 credit_df.to_csv(f'{DATA_IN_PATH}/credit_inp_data.csv', index=False)
 credit_df.to_pickle(f'{DATA_IN_PATH}/credit_inp_data.pkl')
@@ -86,48 +99,19 @@ print(classification_report(y_test, y_pred))
 # mlflow.end_run()
 
 
-# In[16]:
 
-
-ENV_NAME = 'DEV'
-PROJECT_NAME = 'DEMO'
-PREFIX = 'HR'
-ITERATION = 20240128
-PREFIC_ITERATION = f'{PREFIX}__{str(ITERATION)}'
-
-
-GCP_FILE_PATH = f'{ENV_NAME}/{PROJECT_NAME}/{PREFIC_ITERATION}'
-
-print('======================================================================')
-print(f'GCP BUCKET PATH : {GCP_FILE_PATH}')
-print('======================================================================')
 
 
 # ## Export data to cloud storage location
 
-# In[19]:
-
-
 # Will raise an error as the given path is for Google cloud storage, not the local path
-
 # y_pred_df.to_csv(f'{GCP_FILE_PATH}/y_pred.csv' , index=False)
 # y_pred_df.to_pickle(f'{GCP_FILE_PATH}/y_pred.pkl')
 
-
-# In[24]:
-
-
+"""
 # !gsutil -m cp -r {DATA_IN_PATH}/*.csv gs://generic-harsh-buck
-get_ipython().system('gsutil -m cp -r {DATA_IN_PATH} gs://generic-harsh-buck')
-
-
-# In[22]:
-
-
-DATA_IN_PATH
-
-
-# In[ ]:
+# get_ipython().system('gsutil -m cp -r {DATA_IN_PATH} gs://generic-harsh-buck')
+"""
 
 
 
