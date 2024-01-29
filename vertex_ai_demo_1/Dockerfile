@@ -3,6 +3,8 @@ FROM gcr.io/deeplearning-platform-release/tf2-gpu.2-8
 WORKDIR /
 
 COPY src /src
+COPY *.txt /
+COPY *.yml /
 
 RUN pip install -r requirements.txt
 
